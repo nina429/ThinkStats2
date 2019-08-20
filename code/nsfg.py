@@ -14,8 +14,8 @@ import thinkstats2
 from collections import defaultdict
 
 
-def ReadFemResp(dct_file='2002FemResp.dct',
-                dat_file='2002FemResp.dat.gz',
+def ReadFemResp(dct_file='/Users/huiqiang.zhang/pythonProject/think/ThinkStats2/code/2002FemResp.dct',
+                dat_file='/Users/huiqiang.zhang/pythonProject/think/ThinkStats2/code/2002FemResp.dat.gz',
                 nrows=None):
     """Reads the NSFG respondent data.
 
@@ -38,8 +38,9 @@ def CleanFemResp(df):
     pass
 
 
-def ReadFemPreg(dct_file='2002FemPreg.dct',
-                dat_file='2002FemPreg.dat.gz'):
+# ReadStataDct 的参数是字典文件名，返回值dct 是一个 FixedWidthVariables 对象
+def ReadFemPreg(dct_file='/Users/huiqiang.zhang/pythonProject/think/ThinkStats2/code/2002FemPreg.dct',
+                dat_file='/Users/huiqiang.zhang/pythonProject/think/ThinkStats2/code/2002FemPreg.dat.gz'):
     """Reads the NSFG pregnancy data.
 
     dct_file: string file name
@@ -52,7 +53,7 @@ def ReadFemPreg(dct_file='2002FemPreg.dct',
     CleanFemPreg(df)
     return df
 
-
+# 用于 清洗数据 使用（只针对怀孕的例子吧）
 def CleanFemPreg(df):
     """Recodes variables from the pregnancy frame.
 
@@ -63,9 +64,12 @@ def CleanFemPreg(df):
 
     # birthwgt_lb contains at least one bogus value (51 lbs)
     # replace with NaN
+    # 方括号中的表达式产生一个 bool 类型的series 对象，值为true 表示满足该条件
+    # 当一个布尔Series 用作索引是，它只选择满足该条件的元素。
     df.loc[df.birthwgt_lb > 20, 'birthwgt_lb'] = np.nan
     
     # replace 'not ascertained', 'refused', 'don't know' with NaN
+    # 讲 97 98 99 变为 nan, 任何参数运算在中，如果有参数为nan,计算结果都是 nan，所以会得到正确的结果
     na_vals = [97, 98, 99]
     df.birthwgt_lb.replace(na_vals, np.nan, inplace=True)
     df.birthwgt_oz.replace(na_vals, np.nan, inplace=True)
@@ -77,7 +81,10 @@ def CleanFemPreg(df):
     # birthweight is stored in two columns, lbs and oz.
     # convert to a single column in lb
     # NOTE: creating a new column requires dictionary syntax,
+
+    # 添加新列的时候，不能是用点标记法直接添加，必须用括号的方式
     # not attribute assignment (like df.totalwgt_lb)
+    # 点标记法会创建一个新属性，而不是创建一个新列
     df['totalwgt_lb'] = df.birthwgt_lb + df.birthwgt_oz / 16.0    
 
     # due to a bug in ReadStataDct, the last variable gets clipped;
@@ -107,7 +114,7 @@ def ValidatePregnum(resp, preg):
 
     return True
 
-
+# 解释数据  df 是包含妊娠数据的DataFrame 对象。iteritems 遍历所有妊娠记录的索引（行号）和 caseid
 def MakePregMap(df):
     """Make a map from caseid to list of preg indices.
 

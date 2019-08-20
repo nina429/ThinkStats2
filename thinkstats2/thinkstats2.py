@@ -2826,6 +2826,7 @@ class FixedWidthVariables(object):
 
         returns: DataFrame
         """
+        # DataFrame是pandas提供的基础数据数据结。
         df = pandas.read_fwf(filename,
                              colspecs=self.colspecs, 
                              names=self.names,
